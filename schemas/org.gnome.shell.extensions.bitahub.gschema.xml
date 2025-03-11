@@ -1,0 +1,31 @@
+<!--
+SPDX-FileCopyrightText: 2023 Florian Müllner <fmuellner@gnome.org>
+
+SPDX-License-Identifier: GPL-2.0-or-later
+-->
+
+<schemalist gettext-domain="gnome-shell-extensions">
+  <schema id="org.gnome.shell.extensions.bitahub"
+          path="/org/gnome/shell/extensions/bitahub/">
+    <key name="gtx1080ti" type="b">
+      <default>true</default>
+      <summary>Show gtx1080ti</summary>
+    </key>
+    <key name="rtx3090" type="b">
+      <default>true</default>
+      <summary>Show rtx3090</summary>
+    </key>
+    <key name="teslav100" type="b">
+      <default>true</default>
+      <summary>Show teslav100</summary>
+    </key>
+    <key name="teslaa40" type="b">
+      <default>false</default>
+      <summary>Show teslaa40</summary>
+    </key>
+    <key name="debug" type="b">
+      <default>false</default>
+      <summary>Show debug</summary>
+    </key>
+  </schema>
+</schemalist>

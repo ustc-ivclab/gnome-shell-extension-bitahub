@@ -1,0 +1,10 @@
+{
+  "name": "Bitahub",
+  "description": "Display GPU information of bitahub",
+  "url": "http://github.com/ustc-ivclab/gnome-shell-extension-bitahub",
+  "uuid": "bitahub@ustc.edu",
+  "settings-schema": "org.gnome.shell.extensions.bitahub",
+  "shell-version": [
+    "47"
+  ]
+}

@@ -1,0 +1,25 @@
+.icon {
+  icon-size: 12px;
+}
+
+.name {
+  text-align: center;
+  width: 50px;
+}
+
+.number {
+  text-align: center;
+  width: 20px;
+}
+
+.zero {
+  color: red;
+}
+
+.full {
+  color: green;
+}
+
+.unfull {
+  color: yellow;
+}

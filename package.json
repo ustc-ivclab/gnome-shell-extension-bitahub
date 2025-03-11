@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "from-xml": "^0.1.11"
+  },
+  "devDependencies": {
+    "@girs/gnome-shell": "^46.0.0-beta6"
+  },
+  "scripts": {
+    "pack": "mv node_modules node_modules.bak && install -Dm644 node_modules.bak/from-xml/dist/from-xml.mjs -t node_modules/from-xml/dist && gnome-extensions pack --extra-source=node_modules --force && rm -rf node_modules && mv node_modules.bak node_modules"
+  }
+}
