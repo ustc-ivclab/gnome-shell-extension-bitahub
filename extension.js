@@ -62,6 +62,11 @@ class Section extends St.BoxLayout {
                 return GLib.SOURCE_CONTINUE;
             });
     }
+    destroy() {
+        GLib.Source.remove(this._updateId);
+        this._updateId = null;
+        super.destroy();
+    }
 }
 
 class Indicator extends PanelMenu.Button {
@@ -70,6 +75,7 @@ class Indicator extends PanelMenu.Button {
     }
     _init(metadata, settings, session) {
         super._init(0, _(metadata.name));
+        this._session = session;
 
         this.add_child(new St.Icon({
             gicon: new Gio.FileIcon({file: metadata.dir.resolve_relative_path("assets/images/48.png")}),
@@ -85,52 +91,62 @@ class Indicator extends PanelMenu.Button {
         item.add_child(box);
         this.menu.addMenuItem(item);
 
-        this._updateIds = [];
+        this._sections = [];
         const item1 = new PopupMenu.PopupBaseMenuItem({reactive: false});
-        item1.add_child(new Section("1080ti", "gtx1080ti", session));
+        const section1 = new Section("1080ti", "gtx1080ti", session);
+        item1.add_child(section1);
+        this._sections.push(section1);
         settings.bind("gtx1080ti", item1, "visible", Gio.SettingsBindFlags.GET);
         this.menu.addMenuItem(item1);
-        this._updateIds.push(item1.first_child._updateId)
 
         const item2 = new PopupMenu.PopupBaseMenuItem({reactive: false});
-        item2.add_child(new Section("3090", "rtx3090", session));
+        const section2 = new Section("3090", "rtx3090", session);
+        item2.add_child(section2);
+        this._sections.push(section2);
         settings.bind("rtx3090", item2, "visible", Gio.SettingsBindFlags.GET);
         this.menu.addMenuItem(item2);
-        this._updateIds.push(item2.first_child._updateId)
 
         const item3 = new PopupMenu.PopupBaseMenuItem({reactive: false});
-        item3.add_child(new Section("v100", "teslav100", session));
+        const section3 = new Section("v100", "teslav100", session);
+        item3.add_child(section3);
+        this._sections.push(section3);
+        item3.add_child(section3);
         settings.bind("teslav100", item3, "visible", Gio.SettingsBindFlags.GET);
         this.menu.addMenuItem(item3);
-        this._updateIds.push(item3.first_child._updateId)
 
         const item4 = new PopupMenu.PopupBaseMenuItem({reactive: false});
-        item4.add_child(new Section("a40", "teslaa40_L", session));
+        const section4 = new Section("a40", "teslaa40_L", session);
+        item4.add_child(section4);
+        this._sections.push(section4);
+        item4.add_child(section4);
         settings.bind("teslaa40", item4, "visible", Gio.SettingsBindFlags.GET);
         this.menu.addMenuItem(item4);
-        this._updateIds.push(item4.first_child._updateId)
 
         const item5 = new PopupMenu.PopupBaseMenuItem({reactive: false});
-        item5.add_child(new Section("debug", "debug", session));
+        const section5 = new Section("debug", "debug", session);
+        item5.add_child(section5);
+        this._sections.push(section5);
+        item5.add_child(section5);
         settings.bind("debug", item5, "visible", Gio.SettingsBindFlags.GET);
         this.menu.addMenuItem(item5);
-        this._updateIds.push(item5.first_child._updateId)
+    }
+    destroy() {
+        this._session.destroy();
+        this._session = null;
+        for (const section of this._sections) {
+            section.destroy();
+        }
+        super.destroy();
     }
 };
 
 export default class BitahubExtension extends Extension {
     enable() {
-        this._session = new Soup.Session();
-        this._indicator = new Indicator(this.metadata, this.getSettings(), this._session);
+        this._indicator = new Indicator(this.metadata, this.getSettings(), new Soup.Session());
         Main.panel.addToStatusArea(this.uuid, this._indicator);
     }
 
     disable() {
-        for (const updateId of this._indicator._updateIds) {
-            GLib.Source.remove(updateId);
-        }
-        this._session.destroy();
-        this._session = null;
         this._indicator.destroy();
         this._indicator = null;
     }
