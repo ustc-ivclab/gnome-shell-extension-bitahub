@@ -19,12 +19,11 @@ import * as Main from "resource:///org/gnome/shell/ui/main.js";
 
 const number_gpu_max = 8;
 const url = "https://bitahub.ustc.edu.cn/resources/";
-const session = new Soup.Session();
 class Section extends St.BoxLayout {
     static {
         GObject.registerClass(this);
     }
-    constructor(text, device) {
+    constructor(text, device, session) {
         super({style_class: "section"});
         this.add_child(new St.Label({text: text, style_class: "name"}));
         for (let index = number_gpu_max; index > 0; index--) {
@@ -69,7 +68,7 @@ class Indicator extends PanelMenu.Button {
     static {
         GObject.registerClass(this);
     }
-    _init(metadata, settings) {
+    _init(metadata, settings, session) {
         super._init(0, _(metadata.name));
 
         this.add_child(new St.Icon({
@@ -86,40 +85,52 @@ class Indicator extends PanelMenu.Button {
         item.add_child(box);
         this.menu.addMenuItem(item);
 
+        this._updateIds = [];
         const item1 = new PopupMenu.PopupBaseMenuItem({reactive: false});
-        item1.add_child(new Section("1080ti", "gtx1080ti"));
+        item1.add_child(new Section("1080ti", "gtx1080ti", session));
         settings.bind("gtx1080ti", item1, "visible", Gio.SettingsBindFlags.GET);
         this.menu.addMenuItem(item1);
+        this._updateIds.push(item1.first_child._updateId)
 
         const item2 = new PopupMenu.PopupBaseMenuItem({reactive: false});
-        item2.add_child(new Section("3090", "rtx3090"));
+        item2.add_child(new Section("3090", "rtx3090", session));
         settings.bind("rtx3090", item2, "visible", Gio.SettingsBindFlags.GET);
         this.menu.addMenuItem(item2);
+        this._updateIds.push(item2.first_child._updateId)
 
         const item3 = new PopupMenu.PopupBaseMenuItem({reactive: false});
-        item3.add_child(new Section("v100", "teslav100"));
+        item3.add_child(new Section("v100", "teslav100", session));
         settings.bind("teslav100", item3, "visible", Gio.SettingsBindFlags.GET);
         this.menu.addMenuItem(item3);
+        this._updateIds.push(item3.first_child._updateId)
 
         const item4 = new PopupMenu.PopupBaseMenuItem({reactive: false});
-        item4.add_child(new Section("a40", "teslaa40_L"));
+        item4.add_child(new Section("a40", "teslaa40_L", session));
         settings.bind("teslaa40", item4, "visible", Gio.SettingsBindFlags.GET);
         this.menu.addMenuItem(item4);
+        this._updateIds.push(item4.first_child._updateId)
 
         const item5 = new PopupMenu.PopupBaseMenuItem({reactive: false});
-        item5.add_child(new Section("debug", "debug"));
+        item5.add_child(new Section("debug", "debug", session));
         settings.bind("debug", item5, "visible", Gio.SettingsBindFlags.GET);
         this.menu.addMenuItem(item5);
+        this._updateIds.push(item5.first_child._updateId)
     }
 };
 
-export default class ExampleExtension extends Extension {
+export default class BitahubExtension extends Extension {
     enable() {
-        this._indicator = new Indicator(this.metadata, this.getSettings());
+        this._session = new Soup.Session();
+        this._indicator = new Indicator(this.metadata, this.getSettings(), this._session);
         Main.panel.addToStatusArea(this.uuid, this._indicator);
     }
 
     disable() {
+        for (const updateId of this._indicator._updateIds) {
+            GLib.Source.remove(updateId);
+        }
+        this._session.destroy();
+        this._session = null;
         this._indicator.destroy();
         this._indicator = null;
     }
