@@ -131,7 +131,7 @@ class Indicator extends PanelMenu.Button {
         this.menu.addMenuItem(item5);
     }
     destroy() {
-        this._session.destroy();
+        this._session.abort();
         this._session = null;
         for (const section of this._sections) {
             section.destroy();
